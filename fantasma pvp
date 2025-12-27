@@ -1,0 +1,480 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local Workspace = game:GetService("Workspace")
+local TweenService = game:GetService("TweenService")
+local Camera = Workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer
+
+-- Create ScreenGui
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "8KNGSAimbotGui"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.IgnoreGuiInset = true
+ScreenGui.DisplayOrder = 999
+
+local success = pcall(function()
+    ScreenGui.Parent = game:GetService("CoreGui")
+end)
+
+if not success then
+    ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+end
+
+-- Create Main Frame
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 220, 0, 120)
+MainFrame.Position = UDim2.new(0.5, -110, 0.1, 0)
+MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
+
+local Corner = Instance.new("UICorner")
+Corner.CornerRadius = UDim.new(0, 12)
+Corner.Parent = MainFrame
+
+-- Title Bar
+local TitleBar = Instance.new("Frame")
+TitleBar.Size = UDim2.new(1, 0, 0, 40)
+TitleBar.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+TitleBar.BorderSizePixel = 0
+TitleBar.Parent = MainFrame
+
+local TitleCorner = Instance.new("UICorner")
+TitleCorner.CornerRadius = UDim.new(0, 12)
+TitleCorner.Parent = TitleBar
+
+local TitleCover = Instance.new("Frame")
+TitleCover.Size = UDim2.new(1, 0, 0, 20)
+TitleCover.Position = UDim2.new(0, 0, 1, -20)
+TitleCover.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+TitleCover.BorderSizePixel = 0
+TitleCover.Parent = TitleBar
+
+-- Title
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, -60, 1, 0)
+Title.Position = UDim2.new(0, 15, 0, 0)
+Title.BackgroundTransparency = 1
+Title.Text = "8KNGS FANTASMA AIMBOT"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 16
+Title.Font = Enum.Font.GothamBold
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.Parent = TitleBar
+
+-- Status Label
+local StatusLabel = Instance.new("TextLabel")
+StatusLabel.Size = UDim2.new(1, -30, 0, 25)
+StatusLabel.Position = UDim2.new(0, 15, 0, 50)
+StatusLabel.BackgroundTransparency = 1
+StatusLabel.Text = "Status: OFF"
+StatusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+StatusLabel.TextSize = 14
+StatusLabel.Font = Enum.Font.GothamBold
+StatusLabel.TextXAlignment = Enum.TextXAlignment.Left
+StatusLabel.Parent = MainFrame
+
+-- Toggle Container
+local ToggleContainer = Instance.new("Frame")
+ToggleContainer.Size = UDim2.new(0, 100, 0, 40)
+ToggleContainer.Position = UDim2.new(0, 15, 1, -50)
+ToggleContainer.BackgroundTransparency = 1
+ToggleContainer.Parent = MainFrame
+
+-- Toggle Button (Pill Shape)
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Name = "ToggleButton"
+ToggleButton.Size = UDim2.new(0, 55, 0, 30)
+ToggleButton.Position = UDim2.new(0, 0, 0.5, -15)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(60, 60, 70)
+ToggleButton.Text = ""
+ToggleButton.BorderSizePixel = 0
+ToggleButton.Parent = ToggleContainer
+
+local ToggleCorner = Instance.new("UICorner")
+ToggleCorner.CornerRadius = UDim.new(1, 0)
+ToggleCorner.Parent = ToggleButton
+
+-- Toggle Circle
+local ToggleCircle = Instance.new("Frame")
+ToggleCircle.Name = "Circle"
+ToggleCircle.Size = UDim2.new(0, 24, 0, 24)
+ToggleCircle.Position = UDim2.new(0, 3, 0.5, -12)
+ToggleCircle.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+ToggleCircle.BorderSizePixel = 0
+ToggleCircle.Parent = ToggleButton
+
+local CircleCorner = Instance.new("UICorner")
+CircleCorner.CornerRadius = UDim.new(1, 0)
+CircleCorner.Parent = ToggleCircle
+
+-- Close Button
+local CloseButton = Instance.new("TextButton")
+CloseButton.Size = UDim2.new(0, 30, 0, 30)
+CloseButton.Position = UDim2.new(1, -35, 0, 5)
+CloseButton.BackgroundColor3 = Color3.fromRGB(220, 60, 60)
+CloseButton.Text = "×"
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.TextSize = 20
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.BorderSizePixel = 0
+CloseButton.Parent = TitleBar
+
+local CloseCorner = Instance.new("UICorner")
+CloseCorner.CornerRadius = UDim.new(1, 0)
+CloseCorner.Parent = CloseButton
+
+-- FOV Circle (Outer)
+local FOVCircle = Instance.new("Frame")
+FOVCircle.Name = "FOVCircle"
+FOVCircle.Size = UDim2.new(0, 200, 0, 200)
+FOVCircle.Position = UDim2.new(0.5, -100, 0.5, -100)
+FOVCircle.BackgroundTransparency = 1
+FOVCircle.Visible = false
+FOVCircle.Parent = ScreenGui
+
+local CircleOuter = Instance.new("UIStroke")
+CircleOuter.Color = Color3.fromRGB(100, 150, 255)
+CircleOuter.Thickness = 2
+CircleOuter.Transparency = 0.3
+CircleOuter.Parent = FOVCircle
+
+local CircleCornerFOV = Instance.new("UICorner")
+CircleCornerFOV.CornerRadius = UDim.new(1, 0)
+CircleCornerFOV.Parent = FOVCircle
+
+-- Aim Cursor (White Dot in center of screen)
+local AimCursor = Instance.new("Frame")
+AimCursor.Name = "AimCursor"
+AimCursor.Size = UDim2.new(0, 6, 0, 6)
+AimCursor.Position = UDim2.new(0.5, -3, 0.5, -3)
+AimCursor.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+AimCursor.BorderSizePixel = 0
+AimCursor.Visible = false
+AimCursor.Parent = ScreenGui
+AimCursor.ZIndex = 1000
+
+local AimCursorCorner = Instance.new("UICorner")
+AimCursorCorner.CornerRadius = UDim.new(1, 0)
+AimCursorCorner.Parent = AimCursor
+
+-- Lock Indicator
+local LockIndicator = Instance.new("Frame")
+LockIndicator.Name = "LockIndicator"
+LockIndicator.Size = UDim2.new(0, 50, 0, 50)
+LockIndicator.Position = UDim2.new(0.5, -25, 0.5, -25)
+LockIndicator.BackgroundTransparency = 1
+LockIndicator.Visible = false
+LockIndicator.Parent = ScreenGui
+
+local LockStroke = Instance.new("UIStroke")
+LockStroke.Color = Color3.fromRGB(255, 80, 80)
+LockStroke.Thickness = 3
+LockStroke.Parent = LockIndicator
+
+local LockCorner = Instance.new("UICorner")
+LockCorner.CornerRadius = UDim.new(1, 0)
+LockCorner.Parent = LockIndicator
+
+-- Crosshair Lines (4 lines forming a +)
+local function createCrosshairLine()
+    local line = Instance.new("Frame")
+    line.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
+    line.BorderSizePixel = 0
+    line.Parent = LockIndicator
+    return line
+end
+
+local CrosshairTop = createCrosshairLine()
+CrosshairTop.Size = UDim2.new(0, 2, 0, 10)
+CrosshairTop.Position = UDim2.new(0.5, -1, 0, -15)
+
+local CrosshairBottom = createCrosshairLine()
+CrosshairBottom.Size = UDim2.new(0, 2, 0, 10)
+CrosshairBottom.Position = UDim2.new(0.5, -1, 1, 5)
+
+local CrosshairLeft = createCrosshairLine()
+CrosshairLeft.Size = UDim2.new(0, 10, 0, 2)
+CrosshairLeft.Position = UDim2.new(0, -15, 0.5, -1)
+
+local CrosshairRight = createCrosshairLine()
+CrosshairRight.Size = UDim2.new(0, 10, 0, 2)
+CrosshairRight.Position = UDim2.new(1, 5, 0.5, -1)
+
+-- Variables
+local aimbotEnabled = false
+local isRightClicking = false
+local FOVRadius = 100
+local magnetRadius = 200
+local targetPart = "Head"
+local currentTarget = nil
+local isLocked = false
+local lockStartTime = 0
+
+-- Mouse tracking
+local mouse = LocalPlayer:GetMouse()
+
+-- Enhanced target validation
+local function isValidTarget(player)
+    if not player or player == LocalPlayer then return false end
+    if not player.Character then return false end
+    
+    local character = player.Character
+    local head = character:FindFirstChild(targetPart)
+    local humanoid = character:FindFirstChild("Humanoid")
+    local rootPart = character:FindFirstChild("HumanoidRootPart")
+    
+    if not head or not humanoid or not rootPart then return false end
+    if humanoid.Health <= 0 then return false end
+    
+    -- Check if target is visible on screen
+    local screenPos, onScreen = Camera:WorldToViewportPoint(head.Position)
+    if not onScreen then return false end
+    
+    return true
+end
+
+-- Get closest player in FOV with priority system
+local function getClosestPlayerInFOV()
+    local closestPlayer = nil
+    local shortestDistance = magnetRadius
+    local localChar = LocalPlayer.Character
+    
+    if not localChar or not localChar:FindFirstChild("HumanoidRootPart") then
+        return nil
+    end
+    
+    local localRoot = localChar.HumanoidRootPart
+    
+    for _, player in pairs(Players:GetPlayers()) do
+        if isValidTarget(player) then
+            local character = player.Character
+            local head = character:FindFirstChild(targetPart)
+            local screenPos, onScreen = Camera:WorldToViewportPoint(head.Position)
+            
+            if onScreen then
+                local mousePos = UserInputService:GetMouseLocation()
+                local distance = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).Magnitude
+                
+                -- Prioritize closer targets in 3D space as well
+                local worldDistance = (localRoot.Position - head.Position).Magnitude
+                local adjustedDistance = distance + (worldDistance * 0.01)
+                
+                if adjustedDistance < shortestDistance then
+                    closestPlayer = player
+                    shortestDistance = adjustedDistance
+                end
+            end
+        end
+    end
+    
+    return closestPlayer
+end
+
+-- ENHANCED MAGNET FUNCTION - ULTRA FOCUS ON HEAD
+local function magnetToHead(target)
+    if not target or not target.Character then return end
+    
+    local head = target.Character:FindFirstChild(targetPart)
+    local rootPart = target.Character:FindFirstChild("HumanoidRootPart")
+    if not head or not rootPart then return end
+    
+    -- Predict target movement for head tracking
+    local velocity = rootPart.AssemblyLinearVelocity
+    local predictionTime = 0.06 -- Optimized prediction
+    local predictedPos = head.Position + (velocity * predictionTime)
+    
+    local screenPos, onScreen = Camera:WorldToViewportPoint(predictedPos)
+    
+    if onScreen then
+        local mousePos = UserInputService:GetMouseLocation()
+        local targetScreenPos = Vector2.new(screenPos.X, screenPos.Y)
+        local currentMousePos = Vector2.new(mousePos.X, mousePos.Y)
+        
+        local direction = (targetScreenPos - currentMousePos)
+        local distance = direction.Magnitude
+        
+        -- Anti-shake system: Only move if distance is significant
+        if distance < 2 then
+            return -- Don't move if already very close (prevents shake)
+        end
+        
+        -- SMOOTH MAGNET - No shake, strong pull
+        local lockDuration = tick() - lockStartTime
+        local baseStrength = 0.65 -- Smooth base strength
+        local lockBonus = math.min(lockDuration * 0.12, 0.25) -- Progressive bonus
+        local magnetStrength = baseStrength + lockBonus
+        
+        -- Distance-based strength (smooth progression)
+        if distance < 40 then
+            magnetStrength = magnetStrength * 0.85 -- Reduced close-range to prevent shake
+        elseif distance < 100 then
+            magnetStrength = magnetStrength * 1.3 -- Medium range pull
+        elseif distance < 200 then
+            magnetStrength = magnetStrength * 1.5 -- Long range pull
+        end
+        
+        -- Cap strength for smoothness
+        magnetStrength = math.min(magnetStrength, 0.9)
+        
+        local pullAmount = direction * magnetStrength
+        
+        -- Apply smooth mouse movement
+        if distance > 2 then
+            mousemoverel(pullAmount.X, pullAmount.Y)
+        end
+    end
+end
+
+-- Update Lock Indicator Position with enhanced effects
+local function updateLockIndicator(target)
+    if target and target.Character then
+        local head = target.Character:FindFirstChild(targetPart)
+        if head then
+            local screenPos, onScreen = Camera:WorldToViewportPoint(head.Position)
+            if onScreen then
+                LockIndicator.Position = UDim2.new(0, screenPos.X - 25, 0, screenPos.Y - 25)
+                LockIndicator.Visible = true
+                
+                -- Enhanced pulse animation
+                local lockDuration = tick() - lockStartTime
+                local pulseSpeed = 10 + (lockDuration * 2)
+                local pulse = math.sin(tick() * pulseSpeed) * 4
+                LockIndicator.Size = UDim2.new(0, 50 + pulse, 0, 50 + pulse)
+                
+                -- Color intensity based on lock duration
+                local intensity = math.min(lockDuration * 50, 255)
+                LockStroke.Color = Color3.fromRGB(intensity, 80, 80)
+                return
+            end
+        end
+    end
+    LockIndicator.Visible = false
+end
+
+-- Aimbot Loop
+local aimbotConnection = nil
+
+local function startAimbot()
+    if aimbotConnection then return end
+    
+    aimbotConnection = RunService.RenderStepped:Connect(function()
+        if aimbotEnabled and isRightClicking then
+            -- Maintain lock on current target with validation
+            if currentTarget and isValidTarget(currentTarget) then
+                -- Continue locking
+                magnetToHead(currentTarget)
+                updateLockIndicator(currentTarget)
+                
+                CircleOuter.Color = Color3.fromRGB(255, 80, 80)
+                isLocked = true
+            else
+                -- Target lost or invalid, find new target
+                currentTarget = nil
+                local target = getClosestPlayerInFOV()
+                
+                if target then
+                    currentTarget = target
+                    isLocked = true
+                    lockStartTime = tick()
+                    magnetToHead(target)
+                    updateLockIndicator(target)
+                    
+                    CircleOuter.Color = Color3.fromRGB(255, 80, 80)
+                else
+                    currentTarget = nil
+                    isLocked = false
+                    LockIndicator.Visible = false
+                    
+                    CircleOuter.Color = Color3.fromRGB(100, 150, 255)
+                end
+            end
+        elseif not isRightClicking then
+            currentTarget = nil
+            isLocked = false
+            lockStartTime = 0
+            LockIndicator.Visible = false
+            
+            CircleOuter.Color = Color3.fromRGB(100, 150, 255)
+        end
+    end)
+end
+
+local function stopAimbot()
+    if aimbotConnection then
+        aimbotConnection:Disconnect()
+        aimbotConnection = nil
+    end
+    currentTarget = nil
+    isLocked = false
+    lockStartTime = 0
+    LockIndicator.Visible = false
+end
+
+-- Toggle Button
+ToggleButton.MouseButton1Click:Connect(function()
+    aimbotEnabled = not aimbotEnabled
+    
+    local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+    
+    if aimbotEnabled then
+        StatusLabel.Text = "Status: ON"
+        StatusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
+        FOVCircle.Visible = true
+        AimCursor.Visible = true
+        startAimbot()
+        
+        local colorTween = TweenService:Create(ToggleButton, tweenInfo, {BackgroundColor3 = Color3.fromRGB(80, 200, 120)})
+        local circleTween = TweenService:Create(ToggleCircle, tweenInfo, {
+            Position = UDim2.new(1, -27, 0.5, -12),
+            BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        })
+        colorTween:Play()
+        circleTween:Play()
+    else
+        StatusLabel.Text = "Status: OFF"
+        StatusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+        FOVCircle.Visible = false
+        AimCursor.Visible = false
+        stopAimbot()
+        
+        local colorTween = TweenService:Create(ToggleButton, tweenInfo, {BackgroundColor3 = Color3.fromRGB(60, 60, 70)})
+        local circleTween = TweenService:Create(ToggleCircle, tweenInfo, {
+            Position = UDim2.new(0, 3, 0.5, -12),
+            BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+        })
+        colorTween:Play()
+        circleTween:Play()
+    end
+end)
+
+-- Close Button
+CloseButton.MouseButton1Click:Connect(function()
+    stopAimbot()
+    ScreenGui:Destroy()
+end)
+
+-- Update FOV Circle position
+RunService.RenderStepped:Connect(function()
+    if FOVCircle.Visible then
+        local mousePos = UserInputService:GetMouseLocation()
+        FOVCircle.Position = UDim2.new(0, mousePos.X - FOVRadius, 0, mousePos.Y - FOVRadius)
+    end
+end)
+
+-- Right Click Detection
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if input.UserInputType == Enum.UserInputType.MouseButton2 and aimbotEnabled then
+        isRightClicking = true
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input, gameProcessed)
+    if input.UserInputType == Enum.UserInputType.MouseButton2 then
+        isRightClicking = false
+    end
+end)
