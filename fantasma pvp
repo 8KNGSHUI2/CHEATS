@@ -3,6 +3,7 @@ local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local Workspace = game:GetService("Workspace")
 local TweenService = game:GetService("TweenService")
+
 local Camera = Workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
 
@@ -128,11 +129,11 @@ local CloseCorner = Instance.new("UICorner")
 CloseCorner.CornerRadius = UDim.new(1, 0)
 CloseCorner.Parent = CloseButton
 
--- FOV Circle (Outer)
+-- FOV Circle (Outer) - REDUCED SIZE
 local FOVCircle = Instance.new("Frame")
 FOVCircle.Name = "FOVCircle"
-FOVCircle.Size = UDim2.new(0, 200, 0, 200)
-FOVCircle.Position = UDim2.new(0.5, -100, 0.5, -100)
+FOVCircle.Size = UDim2.new(0, 120, 0, 120)
+FOVCircle.Position = UDim2.new(0.5, -60, 0.5, -60)
 FOVCircle.BackgroundTransparency = 1
 FOVCircle.Visible = false
 FOVCircle.Parent = ScreenGui
@@ -147,11 +148,11 @@ local CircleCornerFOV = Instance.new("UICorner")
 CircleCornerFOV.CornerRadius = UDim.new(1, 0)
 CircleCornerFOV.Parent = FOVCircle
 
--- Aim Cursor (White Dot in center of screen)
+-- Aim Cursor (White Dot in center of screen) - SMALLER
 local AimCursor = Instance.new("Frame")
 AimCursor.Name = "AimCursor"
-AimCursor.Size = UDim2.new(0, 6, 0, 6)
-AimCursor.Position = UDim2.new(0.5, -3, 0.5, -3)
+AimCursor.Size = UDim2.new(0, 4, 0, 4)
+AimCursor.Position = UDim2.new(0.5, -2, 0.5, -2)
 AimCursor.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 AimCursor.BorderSizePixel = 0
 AimCursor.Visible = false
@@ -162,11 +163,11 @@ local AimCursorCorner = Instance.new("UICorner")
 AimCursorCorner.CornerRadius = UDim.new(1, 0)
 AimCursorCorner.Parent = AimCursor
 
--- Lock Indicator
+-- Lock Indicator - SMALLER
 local LockIndicator = Instance.new("Frame")
 LockIndicator.Name = "LockIndicator"
-LockIndicator.Size = UDim2.new(0, 50, 0, 50)
-LockIndicator.Position = UDim2.new(0.5, -25, 0.5, -25)
+LockIndicator.Size = UDim2.new(0, 35, 0, 35)
+LockIndicator.Position = UDim2.new(0.5, -17.5, 0.5, -17.5)
 LockIndicator.BackgroundTransparency = 1
 LockIndicator.Visible = false
 LockIndicator.Parent = ScreenGui
@@ -205,11 +206,11 @@ local CrosshairRight = createCrosshairLine()
 CrosshairRight.Size = UDim2.new(0, 10, 0, 2)
 CrosshairRight.Position = UDim2.new(1, 5, 0.5, -1)
 
--- Variables
+-- Variables - REDUCED RADIUS
 local aimbotEnabled = false
 local isRightClicking = false
-local FOVRadius = 100
-local magnetRadius = 200
+local FOVRadius = 60
+local magnetRadius = 120
 local targetPart = "Head"
 local currentTarget = nil
 local isLocked = false
@@ -220,20 +221,32 @@ local mouse = LocalPlayer:GetMouse()
 
 -- Enhanced target validation
 local function isValidTarget(player)
-    if not player or player == LocalPlayer then return false end
-    if not player.Character then return false end
+    if not player or player == LocalPlayer then
+        return false
+    end
+    
+    if not player.Character then
+        return false
+    end
     
     local character = player.Character
     local head = character:FindFirstChild(targetPart)
     local humanoid = character:FindFirstChild("Humanoid")
     local rootPart = character:FindFirstChild("HumanoidRootPart")
     
-    if not head or not humanoid or not rootPart then return false end
-    if humanoid.Health <= 0 then return false end
+    if not head or not humanoid or not rootPart then
+        return false
+    end
+    
+    if humanoid.Health <= 0 then
+        return false
+    end
     
     -- Check if target is visible on screen
     local screenPos, onScreen = Camera:WorldToViewportPoint(head.Position)
-    if not onScreen then return false end
+    if not onScreen then
+        return false
+    end
     
     return true
 end
@@ -242,8 +255,8 @@ end
 local function getClosestPlayerInFOV()
     local closestPlayer = nil
     local shortestDistance = magnetRadius
-    local localChar = LocalPlayer.Character
     
+    local localChar = LocalPlayer.Character
     if not localChar or not localChar:FindFirstChild("HumanoidRootPart") then
         return nil
     end
@@ -277,11 +290,16 @@ end
 
 -- ENHANCED MAGNET FUNCTION - ULTRA FOCUS ON HEAD
 local function magnetToHead(target)
-    if not target or not target.Character then return end
+    if not target or not target.Character then
+        return
+    end
     
     local head = target.Character:FindFirstChild(targetPart)
     local rootPart = target.Character:FindFirstChild("HumanoidRootPart")
-    if not head or not rootPart then return end
+    
+    if not head or not rootPart then
+        return
+    end
     
     -- Predict target movement for head tracking
     local velocity = rootPart.AssemblyLinearVelocity
@@ -337,14 +355,14 @@ local function updateLockIndicator(target)
         if head then
             local screenPos, onScreen = Camera:WorldToViewportPoint(head.Position)
             if onScreen then
-                LockIndicator.Position = UDim2.new(0, screenPos.X - 25, 0, screenPos.Y - 25)
+                LockIndicator.Position = UDim2.new(0, screenPos.X - 17.5, 0, screenPos.Y - 17.5)
                 LockIndicator.Visible = true
                 
-                -- Enhanced pulse animation
+                -- Enhanced pulse animation (smaller range)
                 local lockDuration = tick() - lockStartTime
                 local pulseSpeed = 10 + (lockDuration * 2)
-                local pulse = math.sin(tick() * pulseSpeed) * 4
-                LockIndicator.Size = UDim2.new(0, 50 + pulse, 0, 50 + pulse)
+                local pulse = math.sin(tick() * pulseSpeed) * 3
+                LockIndicator.Size = UDim2.new(0, 35 + pulse, 0, 35 + pulse)
                 
                 -- Color intensity based on lock duration
                 local intensity = math.min(lockDuration * 50, 255)
@@ -360,7 +378,9 @@ end
 local aimbotConnection = nil
 
 local function startAimbot()
-    if aimbotConnection then return end
+    if aimbotConnection then
+        return
+    end
     
     aimbotConnection = RunService.RenderStepped:Connect(function()
         if aimbotEnabled and isRightClicking then
@@ -369,7 +389,6 @@ local function startAimbot()
                 -- Continue locking
                 magnetToHead(currentTarget)
                 updateLockIndicator(currentTarget)
-                
                 CircleOuter.Color = Color3.fromRGB(255, 80, 80)
                 isLocked = true
             else
@@ -383,13 +402,11 @@ local function startAimbot()
                     lockStartTime = tick()
                     magnetToHead(target)
                     updateLockIndicator(target)
-                    
                     CircleOuter.Color = Color3.fromRGB(255, 80, 80)
                 else
                     currentTarget = nil
                     isLocked = false
                     LockIndicator.Visible = false
-                    
                     CircleOuter.Color = Color3.fromRGB(100, 150, 255)
                 end
             end
@@ -398,7 +415,6 @@ local function startAimbot()
             isLocked = false
             lockStartTime = 0
             LockIndicator.Visible = false
-            
             CircleOuter.Color = Color3.fromRGB(100, 150, 255)
         end
     end)
