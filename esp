@@ -1,0 +1,307 @@
+-- Simple Roblox ESP Script with Modern GUI
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+local ESPEnabled = false
+local ESPObjects = {}
+
+-- Configuration
+local SkeletonColor = Color3.fromRGB(255, 255, 255)
+local NameColor = Color3.fromRGB(255, 255, 255)
+local SkeletonThickness = 2
+
+-- Create ScreenGui
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "ESPGui"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.IgnoreGuiInset = true
+ScreenGui.DisplayOrder = 999
+
+local success = pcall(function()
+    ScreenGui.Parent = game:GetService("CoreGui")
+end)
+
+if not success then
+    ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+end
+
+-- Create Main Frame
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 200, 0, 100)
+MainFrame.Position = UDim2.new(0.5, -100, 0.1, 0)
+MainFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
+
+local Corner = Instance.new("UICorner")
+Corner.CornerRadius = UDim.new(0, 12)
+Corner.Parent = MainFrame
+
+-- Title
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 35)
+Title.BackgroundTransparency = 1
+Title.Text = "ESP MENU"
+Title.TextColor3 = Color3.fromRGB(0, 0, 0)
+Title.TextSize = 16
+Title.Font = Enum.Font.GothamBold
+Title.Parent = MainFrame
+
+-- Status Label
+local StatusLabel = Instance.new("TextLabel")
+StatusLabel.Size = UDim2.new(1, -20, 0, 25)
+StatusLabel.Position = UDim2.new(0, 10, 0, 40)
+StatusLabel.BackgroundTransparency = 1
+StatusLabel.Text = "Status: OFF"
+StatusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+StatusLabel.TextSize = 14
+StatusLabel.Font = Enum.Font.Gotham
+StatusLabel.TextXAlignment = Enum.TextXAlignment.Left
+StatusLabel.Parent = MainFrame
+
+-- Toggle Container (Bottom Left)
+local ToggleContainer = Instance.new("Frame")
+ToggleContainer.Size = UDim2.new(0, 100, 0, 40)
+ToggleContainer.Position = UDim2.new(0, 15, 1, -50)
+ToggleContainer.BackgroundTransparency = 1
+ToggleContainer.Parent = MainFrame
+
+-- Toggle Button (Pill Shape)
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Name = "ToggleButton"
+ToggleButton.Size = UDim2.new(0, 50, 0, 28)
+ToggleButton.Position = UDim2.new(0, 0, 0.5, -14)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+ToggleButton.Text = ""
+ToggleButton.BorderSizePixel = 0
+ToggleButton.Parent = ToggleContainer
+
+local ToggleCorner = Instance.new("UICorner")
+ToggleCorner.CornerRadius = UDim.new(1, 0)
+ToggleCorner.Parent = ToggleButton
+
+-- Toggle Circle
+local ToggleCircle = Instance.new("Frame")
+ToggleCircle.Name = "Circle"
+ToggleCircle.Size = UDim2.new(0, 22, 0, 22)
+ToggleCircle.Position = UDim2.new(0, 3, 0.5, -11)
+ToggleCircle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+ToggleCircle.BorderSizePixel = 0
+ToggleCircle.Parent = ToggleButton
+
+local CircleCorner = Instance.new("UICorner")
+CircleCorner.CornerRadius = UDim.new(1, 0)
+CircleCorner.Parent = ToggleCircle
+
+-- Close Button
+local CloseButton = Instance.new("TextButton")
+CloseButton.Size = UDim2.new(0, 25, 0, 25)
+CloseButton.Position = UDim2.new(1, -30, 0, 5)
+CloseButton.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
+CloseButton.Text = "×"
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.TextSize = 18
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.BorderSizePixel = 0
+CloseButton.Parent = MainFrame
+
+local CloseCorner = Instance.new("UICorner")
+CloseCorner.CornerRadius = UDim.new(1, 0)
+CloseCorner.Parent = CloseButton
+
+-- Function to create ESP for a player
+local function CreateESP(player)
+    if player == LocalPlayer then return end
+    
+    local ESPFolder = Instance.new("Folder")
+    ESPFolder.Name = "ESP_" .. player.Name
+    ESPFolder.Parent = Camera
+    
+    ESPObjects[player] = {
+        Folder = ESPFolder,
+        Lines = {},
+        NameTag = nil
+    }
+    
+    -- Create overhead name tag
+    local BillboardGui = Instance.new("BillboardGui")
+    BillboardGui.Name = "NameTag"
+    BillboardGui.AlwaysOnTop = true
+    BillboardGui.Size = UDim2.new(0, 200, 0, 50)
+    BillboardGui.StudsOffset = Vector3.new(0, 3, 0)
+    BillboardGui.Parent = ESPFolder
+    
+    local NameLabel = Instance.new("TextLabel")
+    NameLabel.Size = UDim2.new(1, 0, 1, 0)
+    NameLabel.BackgroundTransparency = 1
+    NameLabel.Text = player.Name
+    NameLabel.TextColor3 = NameColor
+    NameLabel.TextStrokeTransparency = 0.5
+    NameLabel.TextSize = 16
+    NameLabel.Font = Enum.Font.SourceSansBold
+    NameLabel.Parent = BillboardGui
+    
+    ESPObjects[player].NameTag = BillboardGui
+    
+    -- Create skeleton lines
+    local connections = {
+        {"Head", "UpperTorso"},
+        {"UpperTorso", "LowerTorso"},
+        {"UpperTorso", "LeftUpperArm"},
+        {"LeftUpperArm", "LeftLowerArm"},
+        {"LeftLowerArm", "LeftHand"},
+        {"UpperTorso", "RightUpperArm"},
+        {"RightUpperArm", "RightLowerArm"},
+        {"RightLowerArm", "RightHand"},
+        {"LowerTorso", "LeftUpperLeg"},
+        {"LeftUpperLeg", "LeftLowerLeg"},
+        {"LeftLowerLeg", "LeftFoot"},
+        {"LowerTorso", "RightUpperLeg"},
+        {"RightUpperLeg", "RightLowerLeg"},
+        {"RightLowerLeg", "RightFoot"}
+    }
+    
+    for _, connection in ipairs(connections) do
+        local Line = Drawing.new("Line")
+        Line.Visible = false
+        Line.Color = SkeletonColor
+        Line.Thickness = SkeletonThickness
+        Line.Transparency = 1
+        
+        table.insert(ESPObjects[player].Lines, {
+            Line = Line,
+            From = connection[1],
+            To = connection[2]
+        })
+    end
+end
+
+-- Function to remove ESP
+local function RemoveESP(player)
+    if ESPObjects[player] then
+        for _, lineData in ipairs(ESPObjects[player].Lines) do
+            lineData.Line:Remove()
+        end
+        ESPObjects[player].Folder:Destroy()
+        ESPObjects[player] = nil
+    end
+end
+
+-- Function to update ESP
+local function UpdateESP()
+    if not ESPEnabled then return end
+    
+    for player, espData in pairs(ESPObjects) do
+        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local character = player.Character
+            local rootPart = character.HumanoidRootPart
+            
+            -- Update name tag position
+            if espData.NameTag then
+                espData.NameTag.Adornee = rootPart
+            end
+            
+            -- Update skeleton lines
+            for _, lineData in ipairs(espData.Lines) do
+                local fromPart = character:FindFirstChild(lineData.From)
+                local toPart = character:FindFirstChild(lineData.To)
+                
+                if fromPart and toPart then
+                    local fromPos, fromVisible = Camera:WorldToViewportPoint(fromPart.Position)
+                    local toPos, toVisible = Camera:WorldToViewportPoint(toPart.Position)
+                    
+                    lineData.Line.From = Vector2.new(fromPos.X, fromPos.Y)
+                    lineData.Line.To = Vector2.new(toPos.X, toPos.Y)
+                    lineData.Line.Visible = true
+                else
+                    lineData.Line.Visible = false
+                end
+            end
+        else
+            -- Hide ESP if character doesn't exist
+            for _, lineData in ipairs(espData.Lines) do
+                lineData.Line.Visible = false
+            end
+        end
+    end
+end
+
+-- Toggle ESP function
+local function ToggleESP()
+    ESPEnabled = not ESPEnabled
+    
+    -- Tween info for smooth animation
+    local tweenInfo = TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    
+    if ESPEnabled then
+        StatusLabel.Text = "Status: ON"
+        StatusLabel.TextColor3 = Color3.fromRGB(100, 220, 100)
+        
+        -- Animate toggle to green
+        local colorTween = TweenService:Create(ToggleButton, tweenInfo, {BackgroundColor3 = Color3.fromRGB(100, 220, 100)})
+        local positionTween = TweenService:Create(ToggleCircle, tweenInfo, {Position = UDim2.new(1, -25, 0.5, -11)})
+        colorTween:Play()
+        positionTween:Play()
+        
+        -- Create ESP for all players
+        for _, player in ipairs(Players:GetPlayers()) do
+            CreateESP(player)
+        end
+    else
+        StatusLabel.Text = "Status: OFF"
+        StatusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+        
+        -- Animate toggle to gray
+        local colorTween = TweenService:Create(ToggleButton, tweenInfo, {BackgroundColor3 = Color3.fromRGB(200, 200, 200)})
+        local positionTween = TweenService:Create(ToggleCircle, tweenInfo, {Position = UDim2.new(0, 3, 0.5, -11)})
+        colorTween:Play()
+        positionTween:Play()
+        
+        -- Remove all ESP
+        for player, _ in pairs(ESPObjects) do
+            RemoveESP(player)
+        end
+    end
+end
+
+-- Toggle Button Click
+ToggleButton.MouseButton1Click:Connect(ToggleESP)
+
+-- Close Button Click
+CloseButton.MouseButton1Click:Connect(function()
+    if ESPEnabled then
+        ToggleESP()
+    end
+    ScreenGui:Destroy()
+end)
+
+-- Keyboard toggle (Press 'E')
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if not gameProcessed and input.KeyCode == Enum.KeyCode.E then
+        ToggleESP()
+    end
+end)
+
+-- Handle new players
+Players.PlayerAdded:Connect(function(player)
+    if ESPEnabled then
+        player.CharacterAdded:Wait()
+        wait(0.5)
+        CreateESP(player)
+    end
+end)
+
+-- Handle players leaving
+Players.PlayerRemoving:Connect(function(player)
+    RemoveESP(player)
+end)
+
+-- Update ESP every frame
+RunService.RenderStepped:Connect(UpdateESP)
