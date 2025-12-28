@@ -1,4 +1,4 @@
--- Enhanced Roblox ESP Script with Bug Fixes
+-- Simple Roblox ESP Script with Modern GUI
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
@@ -13,7 +13,6 @@ local ESPObjects = {}
 local SkeletonColor = Color3.fromRGB(255, 255, 255)
 local NameColor = Color3.fromRGB(255, 255, 255)
 local SkeletonThickness = 2
-local MaxRenderDistance = 1000 -- Maximum distance to show ESP
 
 -- Create ScreenGui
 local ScreenGui = Instance.new("ScreenGui")
@@ -33,8 +32,8 @@ end
 -- Create Main Frame
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
-MainFrame.Size = UDim2.new(0, 220, 0, 120)
-MainFrame.Position = UDim2.new(0.5, -110, 0.1, 0)
+MainFrame.Size = UDim2.new(0, 200, 0, 100)
+MainFrame.Position = UDim2.new(0.5, -100, 0.1, 0)
 MainFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 MainFrame.BorderSizePixel = 0
 MainFrame.Active = true
@@ -45,50 +44,20 @@ local Corner = Instance.new("UICorner")
 Corner.CornerRadius = UDim.new(0, 12)
 Corner.Parent = MainFrame
 
--- Add gradient effect
-local Gradient = Instance.new("UIGradient")
-Gradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(45, 45, 55)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(35, 35, 45))
-}
-Gradient.Rotation = 90
-Gradient.Parent = MainFrame
-
--- Title Bar
-local TitleBar = Instance.new("Frame")
-TitleBar.Size = UDim2.new(1, 0, 0, 40)
-TitleBar.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
-TitleBar.BorderSizePixel = 0
-TitleBar.Parent = MainFrame
-
-local TitleCorner = Instance.new("UICorner")
-TitleCorner.CornerRadius = UDim.new(0, 12)
-TitleCorner.Parent = TitleBar
-
--- Fix title bar corners at bottom
-local TitleFix = Instance.new("Frame")
-TitleFix.Size = UDim2.new(1, 0, 0, 12)
-TitleFix.Position = UDim2.new(0, 0, 1, -12)
-TitleFix.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
-TitleFix.BorderSizePixel = 0
-TitleFix.Parent = TitleBar
-
 -- Title
 local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, -40, 1, 0)
-Title.Position = UDim2.new(0, 10, 0, 0)
+Title.Size = UDim2.new(1, 0, 0, 35)
 Title.BackgroundTransparency = 1
-Title.Text = "8KNGS ESP"
-Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Text = "ESP MENU"
+Title.TextColor3 = Color3.fromRGB(0, 0, 0)
 Title.TextSize = 16
 Title.Font = Enum.Font.GothamBold
-Title.TextXAlignment = Enum.TextXAlignment.Left
-Title.Parent = TitleBar
+Title.Parent = MainFrame
 
 -- Status Label
 local StatusLabel = Instance.new("TextLabel")
 StatusLabel.Size = UDim2.new(1, -20, 0, 25)
-StatusLabel.Position = UDim2.new(0, 10, 0, 50)
+StatusLabel.Position = UDim2.new(0, 10, 0, 40)
 StatusLabel.BackgroundTransparency = 1
 StatusLabel.Text = "Status: OFF"
 StatusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
@@ -97,29 +66,19 @@ StatusLabel.Font = Enum.Font.Gotham
 StatusLabel.TextXAlignment = Enum.TextXAlignment.Left
 StatusLabel.Parent = MainFrame
 
--- Toggle Container
+-- Toggle Container (Bottom Left)
 local ToggleContainer = Instance.new("Frame")
-ToggleContainer.Size = UDim2.new(0, 150, 0, 35)
-ToggleContainer.Position = UDim2.new(0, 15, 1, -45)
+ToggleContainer.Size = UDim2.new(0, 100, 0, 40)
+ToggleContainer.Position = UDim2.new(0, 15, 1, -50)
 ToggleContainer.BackgroundTransparency = 1
 ToggleContainer.Parent = MainFrame
 
-local ToggleLabel = Instance.new("TextLabel")
-ToggleLabel.Size = UDim2.new(0, 60, 1, 0)
-ToggleLabel.BackgroundTransparency = 1
-ToggleLabel.Text = "Toggle:"
-ToggleLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
-ToggleLabel.TextSize = 13
-ToggleLabel.Font = Enum.Font.Gotham
-ToggleLabel.TextXAlignment = Enum.TextXAlignment.Left
-ToggleLabel.Parent = ToggleContainer
-
--- Toggle Button
+-- Toggle Button (Pill Shape)
 local ToggleButton = Instance.new("TextButton")
 ToggleButton.Name = "ToggleButton"
-ToggleButton.Size = UDim2.new(0, 50, 0, 26)
-ToggleButton.Position = UDim2.new(0, 65, 0.5, -13)
-ToggleButton.BackgroundColor3 = Color3.fromRGB(60, 60, 70)
+ToggleButton.Size = UDim2.new(0, 50, 0, 28)
+ToggleButton.Position = UDim2.new(0, 0, 0.5, -14)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
 ToggleButton.Text = ""
 ToggleButton.BorderSizePixel = 0
 ToggleButton.Parent = ToggleContainer
@@ -131,8 +90,8 @@ ToggleCorner.Parent = ToggleButton
 -- Toggle Circle
 local ToggleCircle = Instance.new("Frame")
 ToggleCircle.Name = "Circle"
-ToggleCircle.Size = UDim2.new(0, 20, 0, 20)
-ToggleCircle.Position = UDim2.new(0, 3, 0.5, -10)
+ToggleCircle.Size = UDim2.new(0, 22, 0, 22)
+ToggleCircle.Position = UDim2.new(0, 3, 0.5, -11)
 ToggleCircle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 ToggleCircle.BorderSizePixel = 0
 ToggleCircle.Parent = ToggleButton
@@ -143,87 +102,23 @@ CircleCorner.Parent = ToggleCircle
 
 -- Close Button
 local CloseButton = Instance.new("TextButton")
-CloseButton.Size = UDim2.new(0, 28, 0, 28)
-CloseButton.Position = UDim2.new(1, -34, 0, 6)
-CloseButton.BackgroundColor3 = Color3.fromRGB(220, 60, 60)
+CloseButton.Size = UDim2.new(0, 25, 0, 25)
+CloseButton.Position = UDim2.new(1, -30, 0, 5)
+CloseButton.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
 CloseButton.Text = "×"
 CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-CloseButton.TextSize = 20
+CloseButton.TextSize = 18
 CloseButton.Font = Enum.Font.GothamBold
 CloseButton.BorderSizePixel = 0
-CloseButton.Parent = TitleBar
+CloseButton.Parent = MainFrame
 
 local CloseCorner = Instance.new("UICorner")
 CloseCorner.CornerRadius = UDim.new(1, 0)
 CloseCorner.Parent = CloseButton
 
--- Hover effect for close button
-CloseButton.MouseEnter:Connect(function()
-    TweenService:Create(CloseButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(255, 80, 80)}):Play()
-end)
-
-CloseButton.MouseLeave:Connect(function()
-    TweenService:Create(CloseButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(220, 60, 60)}):Play()
-end)
-
--- Function to safely get body parts (handles both R6 and R15)
-local function GetBodyParts(character)
-    local parts = {}
-    
-    -- Check if R15 or R6
-    if character:FindFirstChild("UpperTorso") then
-        -- R15
-        parts = {
-            Head = character:FindFirstChild("Head"),
-            UpperTorso = character:FindFirstChild("UpperTorso"),
-            LowerTorso = character:FindFirstChild("LowerTorso"),
-            LeftUpperArm = character:FindFirstChild("LeftUpperArm"),
-            LeftLowerArm = character:FindFirstChild("LeftLowerArm"),
-            LeftHand = character:FindFirstChild("LeftHand"),
-            RightUpperArm = character:FindFirstChild("RightUpperArm"),
-            RightLowerArm = character:FindFirstChild("RightLowerArm"),
-            RightHand = character:FindFirstChild("RightHand"),
-            LeftUpperLeg = character:FindFirstChild("LeftUpperLeg"),
-            LeftLowerLeg = character:FindFirstChild("LeftLowerLeg"),
-            LeftFoot = character:FindFirstChild("LeftFoot"),
-            RightUpperLeg = character:FindFirstChild("RightUpperLeg"),
-            RightLowerLeg = character:FindFirstChild("RightLowerLeg"),
-            RightFoot = character:FindFirstChild("RightFoot")
-        }
-    elseif character:FindFirstChild("Torso") then
-        -- R6 - map to similar structure
-        parts = {
-            Head = character:FindFirstChild("Head"),
-            UpperTorso = character:FindFirstChild("Torso"),
-            LowerTorso = character:FindFirstChild("Torso"),
-            LeftUpperArm = character:FindFirstChild("Left Arm"),
-            LeftLowerArm = character:FindFirstChild("Left Arm"),
-            LeftHand = character:FindFirstChild("Left Arm"),
-            RightUpperArm = character:FindFirstChild("Right Arm"),
-            RightLowerArm = character:FindFirstChild("Right Arm"),
-            RightHand = character:FindFirstChild("Right Arm"),
-            LeftUpperLeg = character:FindFirstChild("Left Leg"),
-            LeftLowerLeg = character:FindFirstChild("Left Leg"),
-            LeftFoot = character:FindFirstChild("Left Leg"),
-            RightUpperLeg = character:FindFirstChild("Right Leg"),
-            RightLowerLeg = character:FindFirstChild("Right Leg"),
-            RightFoot = character:FindFirstChild("Right Leg")
-        }
-    end
-    
-    return parts
-end
-
 -- Function to create ESP for a player
 local function CreateESP(player)
     if player == LocalPlayer then return end
-    if ESPObjects[player] then RemoveESP(player) end -- Remove old ESP if exists
-    
-    local character = player.Character
-    if not character then return end
-    
-    local rootPart = character:FindFirstChild("HumanoidRootPart")
-    if not rootPart then return end
     
     local ESPFolder = Instance.new("Folder")
     ESPFolder.Name = "ESP_" .. player.Name
@@ -232,8 +127,7 @@ local function CreateESP(player)
     ESPObjects[player] = {
         Folder = ESPFolder,
         Lines = {},
-        NameTag = nil,
-        Character = character
+        NameTag = nil
     }
     
     -- Create overhead name tag
@@ -242,7 +136,6 @@ local function CreateESP(player)
     BillboardGui.AlwaysOnTop = true
     BillboardGui.Size = UDim2.new(0, 200, 0, 50)
     BillboardGui.StudsOffset = Vector3.new(0, 3, 0)
-    BillboardGui.Adornee = rootPart
     BillboardGui.Parent = ESPFolder
     
     local NameLabel = Instance.new("TextLabel")
@@ -257,7 +150,7 @@ local function CreateESP(player)
     
     ESPObjects[player].NameTag = BillboardGui
     
-    -- Create skeleton lines (R15 connections)
+    -- Create skeleton lines
     local connections = {
         {"Head", "UpperTorso"},
         {"UpperTorso", "LowerTorso"},
@@ -293,18 +186,10 @@ end
 -- Function to remove ESP
 local function RemoveESP(player)
     if ESPObjects[player] then
-        -- Safely remove all lines
         for _, lineData in ipairs(ESPObjects[player].Lines) do
-            pcall(function()
-                lineData.Line:Remove()
-            end)
+            lineData.Line:Remove()
         end
-        
-        -- Destroy folder
-        pcall(function()
-            ESPObjects[player].Folder:Destroy()
-        end)
-        
+        ESPObjects[player].Folder:Destroy()
         ESPObjects[player] = nil
     end
 end
@@ -314,57 +199,33 @@ local function UpdateESP()
     if not ESPEnabled then return end
     
     for player, espData in pairs(ESPObjects) do
-        -- Check if player still exists
-        if not player or not player.Parent then
-            RemoveESP(player)
-            continue
-        end
-        
-        local character = player.Character
-        local rootPart = character and character:FindFirstChild("HumanoidRootPart")
-        
-        if character and rootPart then
-            -- Check distance
-            local distance = (rootPart.Position - Camera.CFrame.Position).Magnitude
-            local shouldShow = distance <= MaxRenderDistance
+        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local character = player.Character
+            local rootPart = character.HumanoidRootPart
             
-            -- Update name tag
+            -- Update name tag position
             if espData.NameTag then
-                espData.NameTag.Enabled = shouldShow
-                if espData.NameTag.Adornee ~= rootPart then
-                    espData.NameTag.Adornee = rootPart
-                end
+                espData.NameTag.Adornee = rootPart
             end
-            
-            -- Get body parts
-            local bodyParts = GetBodyParts(character)
             
             -- Update skeleton lines
             for _, lineData in ipairs(espData.Lines) do
-                local fromPart = bodyParts[lineData.From]
-                local toPart = bodyParts[lineData.To]
+                local fromPart = character:FindFirstChild(lineData.From)
+                local toPart = character:FindFirstChild(lineData.To)
                 
-                if shouldShow and fromPart and toPart then
+                if fromPart and toPart then
                     local fromPos, fromVisible = Camera:WorldToViewportPoint(fromPart.Position)
                     local toPos, toVisible = Camera:WorldToViewportPoint(toPart.Position)
                     
-                    -- Only show if both points are in front of camera
-                    if fromPos.Z > 0 and toPos.Z > 0 then
-                        lineData.Line.From = Vector2.new(fromPos.X, fromPos.Y)
-                        lineData.Line.To = Vector2.new(toPos.X, toPos.Y)
-                        lineData.Line.Visible = true
-                    else
-                        lineData.Line.Visible = false
-                    end
+                    lineData.Line.From = Vector2.new(fromPos.X, fromPos.Y)
+                    lineData.Line.To = Vector2.new(toPos.X, toPos.Y)
+                    lineData.Line.Visible = true
                 else
                     lineData.Line.Visible = false
                 end
             end
         else
             -- Hide ESP if character doesn't exist
-            if espData.NameTag then
-                espData.NameTag.Enabled = false
-            end
             for _, lineData in ipairs(espData.Lines) do
                 lineData.Line.Visible = false
             end
@@ -376,29 +237,30 @@ end
 local function ToggleESP()
     ESPEnabled = not ESPEnabled
     
+    -- Tween info for smooth animation
     local tweenInfo = TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
     
     if ESPEnabled then
         StatusLabel.Text = "Status: ON"
         StatusLabel.TextColor3 = Color3.fromRGB(100, 220, 100)
         
+        -- Animate toggle to green
         local colorTween = TweenService:Create(ToggleButton, tweenInfo, {BackgroundColor3 = Color3.fromRGB(100, 220, 100)})
-        local positionTween = TweenService:Create(ToggleCircle, tweenInfo, {Position = UDim2.new(1, -23, 0.5, -10)})
+        local positionTween = TweenService:Create(ToggleCircle, tweenInfo, {Position = UDim2.new(1, -25, 0.5, -11)})
         colorTween:Play()
         positionTween:Play()
         
         -- Create ESP for all players
         for _, player in ipairs(Players:GetPlayers()) do
-            if player ~= LocalPlayer and player.Character then
-                CreateESP(player)
-            end
+            CreateESP(player)
         end
     else
         StatusLabel.Text = "Status: OFF"
         StatusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
         
-        local colorTween = TweenService:Create(ToggleButton, tweenInfo, {BackgroundColor3 = Color3.fromRGB(60, 60, 70)})
-        local positionTween = TweenService:Create(ToggleCircle, tweenInfo, {Position = UDim2.new(0, 3, 0.5, -10)})
+        -- Animate toggle to gray
+        local colorTween = TweenService:Create(ToggleButton, tweenInfo, {BackgroundColor3 = Color3.fromRGB(200, 200, 200)})
+        local positionTween = TweenService:Create(ToggleCircle, tweenInfo, {Position = UDim2.new(0, 3, 0.5, -11)})
         colorTween:Play()
         positionTween:Play()
         
@@ -414,12 +276,8 @@ ToggleButton.MouseButton1Click:Connect(ToggleESP)
 
 -- Close Button Click
 CloseButton.MouseButton1Click:Connect(function()
-    -- Clean up before destroying
     if ESPEnabled then
-        ESPEnabled = false
-        for player, _ in pairs(ESPObjects) do
-            RemoveESP(player)
-        end
+        ToggleESP()
     end
     ScreenGui:Destroy()
 end)
@@ -431,34 +289,14 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
     end
 end)
 
--- Handle character respawn
-local function OnCharacterAdded(player, character)
-    if ESPEnabled and player ~= LocalPlayer then
-        wait(0.5) -- Wait for character to fully load
-        CreateESP(player)
-    end
-end
-
 -- Handle new players
 Players.PlayerAdded:Connect(function(player)
-    player.CharacterAdded:Connect(function(character)
-        OnCharacterAdded(player, character)
-    end)
-    
-    -- Handle if character already exists
-    if player.Character then
-        OnCharacterAdded(player, player.Character)
+    if ESPEnabled then
+        player.CharacterAdded:Wait()
+        wait(0.5)
+        CreateESP(player)
     end
 end)
-
--- Handle existing players
-for _, player in ipairs(Players:GetPlayers()) do
-    if player ~= LocalPlayer then
-        player.CharacterAdded:Connect(function(character)
-            OnCharacterAdded(player, character)
-        end)
-    end
-end
 
 -- Handle players leaving
 Players.PlayerRemoving:Connect(function(player)
@@ -467,11 +305,3 @@ end)
 
 -- Update ESP every frame
 RunService.RenderStepped:Connect(UpdateESP)
-
--- Clean up on script destruction
-ScreenGui.Destroying:Connect(function()
-    ESPEnabled = false
-    for player, _ in pairs(ESPObjects) do
-        RemoveESP(player)
-    end
-end)
